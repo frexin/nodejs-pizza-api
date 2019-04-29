@@ -8,8 +8,8 @@ import {
     JoinColumn,
     OneToMany
 } from 'typeorm';
-import { Length, IsEmail } from 'class-validator';
-import {Customer} from "./customer";
+import {Length, IsEmail, ValidateNested} from 'class-validator';
+import {Pizzatype} from "./customer";
 import {Status} from "./status";
 import {OrderItem} from "./order_item";
 import {IsCustomerAlreadyExistConstraint} from "../validators/exist_property";
@@ -24,14 +24,15 @@ export class Order {
     @CreateDateColumn({type: "timestamp"})
     dt_add: Date;
 
-    @ManyToOne(type => Customer, customer => customer.orders, { eager: true })
-    customer: Customer;
+    @ManyToOne(type => Pizzatype, customer => customer.orders, { eager: true })
+    customer: Pizzatype;
 
     @ManyToOne(type => Status, status => status.orders, { eager: true })
     @JoinColumn()
     status: Status;
 
     @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true })
+    @ValidateNested()
     items: OrderItem[];
 
     @Column({nullable: true})

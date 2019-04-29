@@ -2,14 +2,14 @@ import {BaseContext} from 'koa';
 import {getManager, Repository, Not, Equal} from 'typeorm';
 import {validate, ValidationError} from 'class-validator';
 import {User} from '../entity/user';
-import {Customer} from "../entity/customer";
+import {Pizzatype} from "../entity/customer";
 
 export default class CustomerController {
 
     public static async getCustomers(ctx: BaseContext) {
 
-        const customerRep: Repository<Customer> = getManager().getRepository(Customer);
-        const customers: Customer[] = await customerRep.find();
+        const customerRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
+        const customers: Pizzatype[] = await customerRep.find();
 
         ctx.status = 200;
         ctx.body = customers;
@@ -17,9 +17,9 @@ export default class CustomerController {
 
     public static async createCustomer(ctx: BaseContext) {
 
-        const customerRep: Repository<Customer> = getManager().getRepository(Customer);
+        const customerRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
 
-        const customerToSave: Customer = new Customer();
+        const customerToSave: Pizzatype = new Pizzatype();
         let customerObject = ctx.request.body;
 
         customerToSave.name = customerObject.name;

@@ -1,28 +1,28 @@
 import {registerDecorator, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments} from "class-validator";
 import {getManager, Repository} from "typeorm";
-import {Pizzatype} from "../entity/customer";
+import {Pizzatype} from "../entity/pizzatype";
 
 @ValidatorConstraint({ async: true })
-export class IsCustomerAlreadyExistConstraint implements ValidatorConstraintInterface {
+export class IsPizzaTypeExistConstraint implements ValidatorConstraintInterface {
 
     validate(property: any, args: ValidationArguments) {
-        const customerRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
+        const ptypeRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
 
-        return customerRep.findOne({"phone": property}).then(customer => {
-            return !customer;
+        return ptypeRep.findOne(property).then(ptype => {
+            return ptype !== undefined;
         });
     }
 
 }
 
-export function IsCustomerAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsPizzaTypeExist(validationOptions?: ValidationOptions) {
     return function (object: Object, propertyName: string) {
         registerDecorator({
             target: object.constructor,
             propertyName: propertyName,
             options: validationOptions,
             constraints: [],
-            validator: IsCustomerAlreadyExistConstraint
+            validator: IsPizzaTypeExistConstraint
         });
     };
 }

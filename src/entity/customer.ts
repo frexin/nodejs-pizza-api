@@ -4,7 +4,7 @@ import {Order} from "./order";
 import {IsCustomerAlreadyExist} from "../validators/exist_property";
 
 @Entity('customers')
-export class Customer {
+export class Pizzatype {
     @PrimaryGeneratedColumn()
     id: number;
 

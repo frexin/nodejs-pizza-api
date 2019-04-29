@@ -19,7 +19,6 @@ export default class OrderController {
     }
 
     public static async createOrder(ctx: BaseContext) {
-        const pizzaTypeRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
         const ordersRep: Repository<Order> = getManager().getRepository(Order);
 
         let orderObject = ctx.request.body;
@@ -28,24 +27,32 @@ export default class OrderController {
         orderToSave.customerId = orderObject.customer_id;
         orderToSave.statusId = StatusList.New;
 
-        const errors: ValidationError[] = await validate(orderToSave);
+        let orderErrors: ValidationError[] = await validate(orderToSave);
+        let items:Array<OrderItem> = [];
 
         for (let index in orderObject.items) {
             let item = orderObject.items[index];
-
             let orderItem = new OrderItem();
 
             orderItem.quantity = item.quantity;
             orderItem.size = item.size;
-            orderItem.pizzaType = await pizzaTypeRep.findOne(item.type_id);
+            orderItem.pizzaTypeId = item.type_id;
 
-            orderToSave.items.push(orderItem);
+            let itemsErrors: ValidationError[] = await validate(orderItem);
+
+            if (itemsErrors.length) {
+                orderErrors = orderErrors.concat(itemsErrors);
+                break;
+            }
+
+            items.push(orderItem);
         }
 
-        if (errors.length > 0) {
+        if (orderErrors.length > 0) {
             ctx.status = 400;
-            ctx.body = errors;
+            ctx.body = orderErrors;
         } else {
+            orderToSave.items = items;
             const order = await ordersRep.save(orderToSave);
 
             ctx.status = 201;

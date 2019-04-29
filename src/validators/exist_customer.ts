@@ -1,15 +1,15 @@
 import {registerDecorator, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments} from "class-validator";
 import {getManager, Repository} from "typeorm";
-import {Customer} from "../entity/customer";
+import {Pizzatype} from "../entity/customer";
 
 @ValidatorConstraint({ async: true })
 export class IsLinkedCustomerExist implements ValidatorConstraintInterface {
 
     validate(property: any, args: ValidationArguments) {
-        const customerRep: Repository<Customer> = getManager().getRepository(Customer);
+        const customerRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
 
         return customerRep.findOne(property).then(customer => {
-            return !customer;
+            return customer !== undefined;
         });
     }
 

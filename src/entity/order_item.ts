@@ -1,13 +1,14 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
-import { Length, IsEmail } from 'class-validator';
+import {Length, IsEmail, ArrayContains, IsIn} from 'class-validator';
 import {Pizzatype} from "./pizzatype";
 import {pizzatype} from "../controller";
 import {Order} from "./order";
+import {IsPizzaTypeExist, IsPizzaTypeExistConstraint} from "../validators/exist_type";
 
 enum Sizes {
     Small = 25,
-    Medium = 35,
-    Large = 40
+    Medium = 30,
+    Large = 35
 }
 
 @Entity('orders_items')
@@ -25,5 +26,12 @@ export class OrderItem {
     order: Order;
 
     @Column()
-    size: Sizes
+    @IsIn([Sizes.Small, Sizes.Medium, Sizes.Large])
+    size: Sizes;
+
+    @Column()
+    @IsPizzaTypeExist({
+        message: "Unknown pizza type"
+    })
+    pizzaTypeId: number;
 }
