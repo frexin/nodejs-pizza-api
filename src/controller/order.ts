@@ -20,6 +20,20 @@ export default class OrderController {
         ctx.body = orders;
     }
 
+    public static async getOrder(ctx: BaseContext) {
+        let orderId = +ctx.params.id || 0;
+
+        const ordersRep: Repository<Order> = getManager().getRepository(Order);
+        const order: Order = await ordersRep.findOne(orderId);
+
+        if (!order) {
+            return this.orderNotFound(ctx, orderId);
+        }
+
+        ctx.status = 200;
+        ctx.body = order;
+    }
+
     public static async createOrder(ctx: BaseContext) {
         let orderObject = ctx.request.body;
         let orderToSave: Order = new Order();
@@ -40,22 +54,11 @@ export default class OrderController {
         let orderToUpdate: Order = await ordersRep.findOne(orderId);
 
         if (!orderToUpdate) {
-            ctx.status = 404;
-
-            let notFoundError:ValidationError = new ValidationError();
-            notFoundError.property = "id";
-            notFoundError.value = orderId;
-            notFoundError.constraints = {
-                "id": "Order not found"
-            };
-
-            ctx.body = notFoundError;
-            return;
+            return this.orderNotFound(ctx, orderId);
         }
 
         if (orderObject.statusId) {
-            let status: Status = new Status(orderObject.statusId);
-            orderToUpdate.status = status;
+            orderToUpdate.status = new Status(orderObject.statusId);
         }
 
         let items:Array<OrderItem> = orderToUpdate.items;
@@ -67,7 +70,34 @@ export default class OrderController {
         await OrderController.validateAndSendResult(items, ctx, orderToUpdate);
     }
 
-    public static async prepareAndValidateOrderItems(itemsData, itemsToDelete?: Array<OrderItem>) {
+    public static async deleteOrder(ctx: BaseContext) {
+        let orderId = +ctx.params.id || 0;
+
+        const ordersRep: Repository<Order> = getManager().getRepository(Order);
+        const order: Order = await ordersRep.findOne(orderId);
+
+        if (!order) {
+            return this.orderNotFound(ctx, orderId);
+        }
+
+        ordersRep.delete(orderId);
+        ctx.status = 200;
+    }
+
+    private static orderNotFound(ctx: BaseContext, orderId) {
+        ctx.status = 404;
+
+        let notFoundError: ValidationError = new ValidationError();
+        notFoundError.property = "id";
+        notFoundError.value = orderId;
+        notFoundError.constraints = {
+            "id": "Order not found"
+        };
+
+        ctx.body = notFoundError;
+    }
+
+    private static async prepareAndValidateOrderItems(itemsData, itemsToDelete?: Array<OrderItem>) {
         let items:Array<OrderItem> = [];
 
         for (let index in itemsData) {

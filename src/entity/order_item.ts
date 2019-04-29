@@ -21,7 +21,7 @@ export class OrderItem {
     @ManyToOne(type => Pizzatype, pizzatype => pizzatype.orderItems, { eager: true })
     pizzaType: Pizzatype;
 
-    @ManyToOne(type => Order, order => order.items)
+    @ManyToOne(type => Order, order => order.items, {onDelete: "CASCADE"})
     order: Order;
 
     @Column()

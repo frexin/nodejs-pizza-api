@@ -16,6 +16,8 @@ router.post('/customers', controller.customer.createCustomer);
 router.get('/orders', controller.order.getOrders);
 router.post('/orders', controller.order.createOrder );
 router.put('/orders/:id', controller.order.updateOrder );
+router.get('/orders/:id', controller.order.getOrder );
+router.delete('/orders/:id', controller.order.deleteOrder );
 
 
 

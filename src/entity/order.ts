@@ -32,7 +32,7 @@ export class Order {
     @IsStatusAllowed()
     status: Status;
 
-    @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true, cascade: true })
+    @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true, cascade: true, onDelete: "CASCADE" })
     items: OrderItem[];
 
     @Column({nullable: true})
