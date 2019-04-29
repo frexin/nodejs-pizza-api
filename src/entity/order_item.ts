@@ -1,7 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
 import {Length, IsEmail, ArrayContains, IsIn} from 'class-validator';
 import {Pizzatype} from "./pizzatype";
-import {pizzatype} from "../controller";
 import {Order} from "./order";
 import {IsPizzaTypeExist, IsPizzaTypeExistConstraint} from "../validators/exist_type";
 

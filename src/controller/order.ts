@@ -4,10 +4,12 @@ import {Order} from "../entity/order";
 import {Status, StatusList} from "../entity/status";
 import {OrderItem} from "../entity/order_item";
 import {Pizzatype} from "../entity/pizzatype";
-import {validate, ValidationError} from "class-validator";
+import {validate, validateSync, ValidationError} from "class-validator";
 
 
 export default class OrderController {
+
+    static itemsValidationErrors:ValidationError[] = [];
 
     public static async getOrders(ctx: BaseContext) {
 
@@ -19,19 +21,57 @@ export default class OrderController {
     }
 
     public static async createOrder(ctx: BaseContext) {
+        let orderObject = ctx.request.body;
+        let orderToSave: Order = new Order();
+
+        orderToSave.customerId = orderObject.customer_id;
+        orderToSave.statusId = StatusList.New;
+
+        let items:Array<OrderItem> = await OrderController.prepareAndValidateOrderItems(orderObject.items);
+        await OrderController.validateAndSendResult(items, ctx, orderToSave);
+    }
+
+    public static async updateOrder(ctx: BaseContext) {
         const ordersRep: Repository<Order> = getManager().getRepository(Order);
 
         let orderObject = ctx.request.body;
 
-        let orderToSave: Order = new Order();
-        orderToSave.customerId = orderObject.customer_id;
-        orderToSave.statusId = StatusList.New;
+        let orderId = +ctx.params.id || 0;
+        let orderToUpdate: Order = await ordersRep.findOne(orderId);
 
-        let orderErrors: ValidationError[] = await validate(orderToSave);
+        if (!orderToUpdate) {
+            ctx.status = 404;
+
+            let notFoundError:ValidationError = new ValidationError();
+            notFoundError.property = "id";
+            notFoundError.value = orderId;
+            notFoundError.constraints = {
+                "id": "Order not found"
+            };
+
+            ctx.body = notFoundError;
+            return;
+        }
+
+        if (orderObject.statusId) {
+            let status: Status = new Status(orderObject.statusId);
+            orderToUpdate.status = status;
+        }
+
+        let items:Array<OrderItem> = orderToUpdate.items;
+
+        if (orderObject.items) {
+            items = await OrderController.prepareAndValidateOrderItems(orderObject.items, orderToUpdate.items);
+        }
+
+        await OrderController.validateAndSendResult(items, ctx, orderToUpdate);
+    }
+
+    public static async prepareAndValidateOrderItems(itemsData, itemsToDelete?: Array<OrderItem>) {
         let items:Array<OrderItem> = [];
 
-        for (let index in orderObject.items) {
-            let item = orderObject.items[index];
+        for (let index in itemsData) {
+            let item = itemsData[index];
             let orderItem = new OrderItem();
 
             orderItem.quantity = item.quantity;
@@ -41,16 +81,34 @@ export default class OrderController {
             let itemsErrors: ValidationError[] = await validate(orderItem);
 
             if (itemsErrors.length) {
-                orderErrors = orderErrors.concat(itemsErrors);
+                OrderController.itemsValidationErrors = itemsErrors;
+                items = [];
                 break;
             }
 
             items.push(orderItem);
         }
 
-        if (orderErrors.length > 0) {
+        if (items.length && itemsToDelete) {
+            const itemsRep: Repository<OrderItem> = getManager().getRepository(OrderItem);
+
+            itemsToDelete.map((item) => {
+                itemsRep.delete({id: item.id});
+            });
+        }
+
+        return items;
+    }
+
+    private static async validateAndSendResult(items: Array<OrderItem>, ctx: BaseContext, orderToSave: Order) {
+        const ordersRep: Repository<Order> = getManager().getRepository(Order);
+        let validationErrors = await validate(orderToSave);
+
+        if (items.length == 0 || validationErrors.length !== 0) {
+            validationErrors = OrderController.itemsValidationErrors.concat(validationErrors);
+
             ctx.status = 400;
-            ctx.body = orderErrors;
+            ctx.body = validationErrors;
         } else {
             orderToSave.items = items;
             const order = await ordersRep.save(orderToSave);
@@ -59,5 +117,4 @@ export default class OrderController {
             ctx.body = order;
         }
     }
-
 }

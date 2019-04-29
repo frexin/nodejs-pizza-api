@@ -12,8 +12,8 @@ import {Length, IsEmail, ValidateNested} from 'class-validator';
 import {Pizzatype} from "./customer";
 import {Status} from "./status";
 import {OrderItem} from "./order_item";
-import {IsCustomerAlreadyExistConstraint} from "../validators/exist_property";
 import {IsCustomerExist} from "../validators/exist_customer";
+import {IsStatusAllowed} from "../validators/status_constraint";
 
 @Entity('orders')
 export class Order {
@@ -29,10 +29,10 @@ export class Order {
 
     @ManyToOne(type => Status, status => status.orders, { eager: true })
     @JoinColumn()
+    @IsStatusAllowed()
     status: Status;
 
-    @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true })
-    @ValidateNested()
+    @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true, cascade: true })
     items: OrderItem[];
 
     @Column({nullable: true})
