@@ -9,7 +9,7 @@ import {
     OneToMany
 } from 'typeorm';
 import {Length, IsEmail, ValidateNested} from 'class-validator';
-import {Pizzatype} from "./customer";
+import {Customer} from "./customer";
 import {Status} from "./status";
 import {OrderItem} from "./order_item";
 import {IsCustomerExist} from "../validators/exist_customer";
@@ -24,8 +24,8 @@ export class Order {
     @CreateDateColumn({type: "timestamp"})
     dt_add: Date;
 
-    @ManyToOne(type => Pizzatype, customer => customer.orders, { eager: true })
-    customer: Pizzatype;
+    @ManyToOne(type => Customer, customer => customer.orders, { eager: true })
+    customer: Customer;
 
     @ManyToOne(type => Status, status => status.orders, { eager: true })
     @JoinColumn()

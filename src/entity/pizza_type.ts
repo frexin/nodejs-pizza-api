@@ -3,7 +3,7 @@ import { Length, IsEmail } from 'class-validator';
 import {OrderItem} from "./order_item";
 
 @Entity('pizza_types')
-export class Pizzatype {
+export class PizzaType {
     @PrimaryGeneratedColumn()
     id: number;
 

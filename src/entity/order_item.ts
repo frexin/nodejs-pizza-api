@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
 import {Length, IsEmail, ArrayContains, IsIn} from 'class-validator';
-import {Pizzatype} from "./pizzatype";
+import {PizzaType} from "./pizza_type";
 import {Order} from "./order";
 import {IsPizzaTypeExist, IsPizzaTypeExistConstraint} from "../validators/exist_type";
 
@@ -18,8 +18,8 @@ export class OrderItem {
     @Column()
     quantity: Number;
 
-    @ManyToOne(type => Pizzatype, pizzatype => pizzatype.orderItems, { eager: true })
-    pizzaType: Pizzatype;
+    @ManyToOne(type => PizzaType, pizzatype => pizzatype.orderItems, { eager: true })
+    pizzaType: PizzaType;
 
     @ManyToOne(type => Order, order => order.items, {onDelete: "CASCADE"})
     order: Order;

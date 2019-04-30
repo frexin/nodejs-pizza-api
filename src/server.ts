@@ -22,13 +22,12 @@ let application = createConnection({
     synchronize: true,
     logging: false,
     entities: [
-       'dist/entity/**/*.js'
+       'dist/entity/**/*{.ts,.js}'
     ],
     extra: {
-        ssl: config.dbsslconn,
+        ssl: false,
     }
  }).then(async connection => {
-
     const app = new Koa();
     app.use(cors());
     app.use(bodyParser());

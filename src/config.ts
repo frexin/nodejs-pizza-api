@@ -15,7 +15,7 @@ const config: IConfig = {
     debugLogging: process.env.NODE_ENV == 'development',
     dbsslconn: process.env.NODE_ENV != 'development',
     jwtSecret: process.env.JWT_SECRET || 'your-secret-whatever',
-    databaseUrl: process.env.DATABASE_URL || 'postgres://user:pass@localhost:5432/apidb'
+    databaseUrl: process.env.NODE_ENV == 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL
 };
 
 export { config };

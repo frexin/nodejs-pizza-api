@@ -1,12 +1,12 @@
 import {registerDecorator, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments} from "class-validator";
 import {getManager, Repository} from "typeorm";
-import {Pizzatype} from "../entity/pizzatype";
+import {PizzaType} from "../entity/pizza_type";
 
 @ValidatorConstraint({ async: true })
 export class IsPizzaTypeExistConstraint implements ValidatorConstraintInterface {
 
     validate(property: any, args: ValidationArguments) {
-        const ptypeRep: Repository<Pizzatype> = getManager().getRepository(Pizzatype);
+        const ptypeRep: Repository<PizzaType> = getManager().getRepository(PizzaType);
 
         return ptypeRep.findOne(property).then(ptype => {
             return ptype !== undefined;
