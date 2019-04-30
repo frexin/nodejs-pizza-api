@@ -1,10 +1,9 @@
 import {BaseContext} from 'koa';
-import {getManager, Repository, Not, Equal} from 'typeorm';
+import {getManager, Repository, Not, Equal, getRepository, QueryBuilder} from 'typeorm';
 import {Order} from "../entity/order";
 import {Status, StatusList} from "../entity/status";
 import {OrderItem} from "../entity/order_item";
-import {Pizzatype} from "../entity/pizzatype";
-import {validate, validateSync, ValidationError} from "class-validator";
+import {validate, ValidationError} from "class-validator";
 
 
 export default class OrderController {
@@ -13,8 +12,25 @@ export default class OrderController {
 
     public static async getOrders(ctx: BaseContext) {
 
-        const ordersRep: Repository<Order> = getManager().getRepository(Order);
-        const orders: Order[] = await ordersRep.find();
+        let filter = ctx.request.query;
+        let qb = getRepository(Order).createQueryBuilder("order")
+            .leftJoinAndSelect("order.items", "items");
+
+        let allowedFilters = {"customer": "customerId", "status": "statusId"};
+
+        for (let key in allowedFilters) {
+            let val = allowedFilters[key];
+
+            if (key in filter) {
+                let params = {};
+                params[key] = filter[key];
+
+                qb.andWhere(`order.${val} = :${key}`, params);
+            }
+        }
+
+
+        let orders:Order[] = await qb.getMany();
 
         ctx.status = 200;
         ctx.body = orders;
