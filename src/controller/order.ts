@@ -54,7 +54,7 @@ export default class OrderController {
         let orderObject = ctx.request.body;
         let orderToSave: Order = new Order();
 
-        orderToSave.customerId = orderObject.customer_id;
+        orderToSave.customerId = orderObject.customerId;
         orderToSave.statusId = StatusList.New;
 
         let items:Array<OrderItem> = await OrderController.prepareAndValidateOrderItems(orderObject.items);
@@ -122,7 +122,7 @@ export default class OrderController {
 
             orderItem.quantity = item.quantity;
             orderItem.size = item.size;
-            orderItem.pizzaTypeId = item.type_id;
+            orderItem.pizzaTypeId = item.pizzaTypeId;
 
             let itemsErrors: ValidationError[] = await validate(orderItem);
 
@@ -147,7 +147,7 @@ export default class OrderController {
     }
 
     private static async validateAndSendResult(items: Array<OrderItem>, ctx: BaseContext, orderToSave: Order) {
-        const ordersRep: Repository<Order> = getManager().getRepository(Order);
+        const ordersRep: Repository<Order> = getManager().getRepository("orders");
         let validationErrors = await validate(orderToSave);
 
         if (items.length == 0 || validationErrors.length !== 0) {

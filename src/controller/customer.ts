@@ -2,6 +2,7 @@ import {BaseContext} from 'koa';
 import {getManager, Repository, Not, Equal} from 'typeorm';
 import {validate, ValidationError} from 'class-validator';
 import {Customer} from '../entity/customer';
+import {Order} from "../entity/order";
 
 export default class CustomerController {
 
@@ -12,6 +13,20 @@ export default class CustomerController {
 
         ctx.status = 200;
         ctx.body = customers;
+    }
+
+    public static async getCustomer(ctx: BaseContext) {
+        let customerId = +ctx.params.id || 0;
+
+        const ordersRep: Repository<Customer> = getManager().getRepository("customers");
+        const customer: Customer = await ordersRep.findOne(customerId);
+
+        if (!customer) {
+            ctx.status = 404;
+        }
+
+        ctx.status = 200;
+        ctx.body = customer;
     }
 
     public static async createCustomer(ctx: BaseContext) {

@@ -1,6 +1,4 @@
 import {registerDecorator, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments} from "class-validator";
-import {getManager, Repository} from "typeorm";
-import {PizzaType} from "../entity/pizza_type";
 import {Status} from "../entity/status";
 import {Order} from "../entity/order";
 import {StatusResolver} from "../helpers/status_resolver";
@@ -12,6 +10,10 @@ export class IsNextStatusAllowedConstraint implements ValidatorConstraintInterfa
         let newStatus:Status = property;
         let oldOrder:Order = (<Order>args.object);
         let allowedNextStatuses:Array<number> = StatusResolver.getAllowedNextSteps(oldOrder.statusId);
+
+        if (newStatus.id == oldOrder.statusId) {
+            return true;
+        }
 
         return allowedNextStatuses.indexOf(newStatus.id) !== -1;
     }

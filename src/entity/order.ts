@@ -8,7 +8,7 @@ import {
     JoinColumn,
     OneToMany
 } from 'typeorm';
-import {Length, IsEmail, ValidateNested} from 'class-validator';
+import {Length, IsEmail, ValidateNested, ValidateIf} from 'class-validator';
 import {Customer} from "./customer";
 import {Status} from "./status";
 import {OrderItem} from "./order_item";
@@ -30,12 +30,13 @@ export class Order {
     @ManyToOne(type => Status, status => status.orders, { eager: true })
     @JoinColumn()
     @IsStatusAllowed()
+    @ValidateIf(o => o.status !== undefined)
     status: Status;
 
     @OneToMany(type => OrderItem, orderItem => orderItem.order, { eager: true, cascade: true, onDelete: "CASCADE" })
     items: OrderItem[];
 
-    @Column({nullable: true})
+    @Column({nullable: false})
     @IsCustomerExist({
         message: "Unknown customer"
     })

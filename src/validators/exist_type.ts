@@ -6,7 +6,7 @@ import {PizzaType} from "../entity/pizza_type";
 export class IsPizzaTypeExistConstraint implements ValidatorConstraintInterface {
 
     validate(property: any, args: ValidationArguments) {
-        const ptypeRep: Repository<PizzaType> = getManager().getRepository(PizzaType);
+        const ptypeRep: Repository<PizzaType> = getManager().getRepository("pizza_types");
 
         return ptypeRep.findOne(property).then(ptype => {
             return ptype !== undefined;

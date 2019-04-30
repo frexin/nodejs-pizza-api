@@ -6,7 +6,7 @@ import {Customer} from "../entity/customer";
 export class IsCustomerAlreadyExistConstraint implements ValidatorConstraintInterface {
 
     validate(property: any, args: ValidationArguments) {
-        const customerRep: Repository<Customer> = getManager().getRepository(Customer);
+        const customerRep: Repository<Customer> = getManager().getRepository("customers");
 
         return customerRep.findOne({"phone": property}).then(customer => {
             return !customer;

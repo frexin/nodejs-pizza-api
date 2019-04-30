@@ -20,7 +20,7 @@ let application = createConnection({
     password: connectionOptions.password,
     database: connectionOptions.database,
     synchronize: true,
-    logging: false,
+    logging: true,
     entities: [
        'dist/entity/**/*{.ts,.js}'
     ],
