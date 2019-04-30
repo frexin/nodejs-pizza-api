@@ -6,10 +6,8 @@
   "scripts": {
     "watch-server": "nodemon --watch 'src/**/*' -e ts,tsx --exec ts-node src/server.ts",
     "build-ts": "tsc",
-    "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
     "serve": "node dist/index.js",
-    "build": "npm run tslint && npm run build-ts && npm run copy-static-assets",
+    "build": "npm run build-ts",
     "start": "npm run serve",
     "heroku-postbuild": "npm run build",
     "test": "jest --forceExit --config jest-config.json"
@@ -59,9 +57,8 @@
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^7.0.1",
-    "tslint": "^5.10.0",
     "typeorm-seeding": "^1.0.0-beta.6",
-    "typescript": "^3.0.1"
+    "typescript": "^3.3.3"
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
